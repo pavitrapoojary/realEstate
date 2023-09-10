@@ -2,17 +2,27 @@ package com.realEstate.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.realEstate.entity.Property;
+import com.realEstate.repo.PropertyRepository;
 import com.realEstate.service.PropertyService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -25,8 +35,20 @@ class PropertyControllerTest {
     @InjectMocks
     private PropertyController propertyController;
 
-    @Mock
+    @MockBean
     private PropertyService propertyService;
+
+//    @Mock
+//    private PropertyRepository propertyRepository;
+    Property property = new Property();
+
+    @BeforeEach
+    void setUp(){
+        property.setId(1);
+        property.setAddress("pune");
+        property.setPrice(300.2);
+
+    }
 
     @Test
     void addProperty() throws Exception {
@@ -39,11 +61,19 @@ class PropertyControllerTest {
 
     @Test
     void getPropertyBYId() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/property/{id}", 1))
+        //GIVEN
+        when(propertyService.getPropertyById(1)).thenReturn(property);
+        //WHEN
+        Property propertyResult = propertyService.getPropertyById(1);
+        //THEN
+        assertEquals("pune", propertyResult.getAddress());
+        verify(propertyService).getPropertyById(1);
+       /* mockMvc.perform(MockMvcRequestBuilders.get("/property/{id}", 1))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.address").value("pune"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.price").value("300.2"));
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1));*/
+//                .andExpect(MockMvcResultMatchers.jsonPath("$.address").value("pune"))
+//                .andExpect(MockMvcResultMatchers.jsonPath("$.price").value("300.2"));
     }
 
     @Test

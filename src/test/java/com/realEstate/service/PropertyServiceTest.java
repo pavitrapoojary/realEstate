@@ -4,6 +4,8 @@ import com.realEstate.entity.Property;
 import com.realEstate.repo.PropertyRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,13 +17,21 @@ import static org.mockito.Mockito.*;
 public class PropertyServiceTest {
 
     Property property = new Property(1, "address", 200.2, 2, 3, 2.4);
-    private PropertyService propertyService;
+    @InjectMocks
+    private PropertyServiceImpl propertyService;
+
+    @Mock
     private PropertyRepository propertyRepository;
 
     @BeforeEach
     void setUp() {
         propertyRepository = mock(PropertyRepository.class);
         propertyService = new PropertyServiceImpl(propertyRepository);
+        Property property = new Property();
+        property.setId(1);
+        property.setAddress("pune");
+        property.setPrice(300.2);
+        when(propertyRepository.findById(1)).thenReturn(Optional.of(property));
     }
 
     @Test
@@ -29,13 +39,15 @@ public class PropertyServiceTest {
         when(propertyRepository.save(any(Property.class))).thenReturn(property);
         propertyService.addProperty(property);
         verify(propertyRepository, times(1)).save(property);
+//        assertEquals();
     }
 
     @Test
     void getPropertyById() {
-        when(propertyRepository.findById(1)).thenReturn(Optional.ofNullable(property));
-        propertyService.getPropertyById(1);
+//        when(propertyRepository.findById(1)).thenReturn(Optional.ofNullable(property));
+        Property actualProperty = propertyService.getPropertyById(1);
         verify(propertyRepository, times(1)).findById(1);
+        assertEquals(property.getId(),actualProperty.getId());
     }
 
     @Test

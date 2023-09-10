@@ -18,6 +18,7 @@ public class PropertyController {
 
     @GetMapping("/property/{id}")
     public Property getPropertyById(@PathVariable Integer id){
+
         return this.propertyService.getPropertyById(id);
     }
 
